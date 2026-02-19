@@ -1,0 +1,4 @@
+# ROS Noetic does not support opencv3 (see https://wiki.ros.org/opencv3)
+# This was listed as a dependency in polaris_gem_e2
+opencv3:
+  ubuntu: []
