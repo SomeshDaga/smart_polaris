@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>gem_state_msgs</name>
+  <version>0.0.1</version>
+  <description>ROS Messages for communication of gem e2 states</description>
+
+  <maintainer email="someshdaga94@gmail.com">Somesh Daga</maintainer>
+  <license>Proprietary</license>
+  <author email="someshdaga94@gmail.com">Somesh Daga</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>message_generation</build_depend>
+  <depend>std_msgs</depend>
+  <exec_depend>message_runtime</exec_depend> 
+
+  <export>
+    <architecture_independent/>
+  </export>
+</package>

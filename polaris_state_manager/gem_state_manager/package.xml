@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>gem_state_manager</name>
+  <version>0.0.1</version>
+  <description>Provide nodes and logic for gem e2 state management</description>
+
+  <maintainer email="someshdaga94@gmail.com">Somesh Daga</maintainer>
+  <license>Proprietary</license>
+  <author email="someshdaga94@gmail.com">Somesh Daga</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>roscpp</depend>
+  <depend>gem_state_msgs</depend>
+  <depend>smacc</depend>
+  <exec_depend>message_runtime</exec_depend>
+</package>

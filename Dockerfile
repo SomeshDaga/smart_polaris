@@ -51,7 +51,7 @@ RUN groupadd -g $GID ros && \
 COPY scripts/entrypoint.sh /
 
 # Create workspace directories for our code
-RUN mkdir -p /home/ros/polaris_ws/src && mkdir -p /home/ros/steerai_ws/src
+RUN mkdir -p /home/ros/polaris_ws/src
 
 # Update rosdeps prior to rosdep install
 RUN rosdep update --include-eol-distros
@@ -60,20 +60,15 @@ RUN rosdep update --include-eol-distros
 # Note: For development, we will bind mount directories from the host
 COPY polaris_gem_e2 /home/ros/polaris_ws/src
 
-# Build the workspaces
+# Build the workspace
 WORKDIR /home/ros/polaris_ws
-RUN bash -c "source /opt/ros/noetic/setup.bash && \
-	rosdep install --from-paths src --ignore-src -y && \
-	catkin_make"
-
-WORKDIR /home/ros/steerai_ws
 RUN bash -c "source /opt/ros/noetic/setup.bash && \
 	rosdep install --from-paths src --ignore-src -y && \
 	catkin_make"
 
 # Ensure entrypoint script is executable by our ros user
 # which will be the default user during runtime
-RUN chown ros:ros /entrypoint.sh && chown ros:ros /home/ros/polaris_ws && chown ros:ros /home/ros/steerai_ws
+RUN chown ros:ros /entrypoint.sh && chown -R ros:ros /home/ros/polaris_ws
 
 # Only allow this for dev containers; disable for prod containers
 RUN if [ "$BUILD_DEV_IMAGE" = "true" ]; then \
