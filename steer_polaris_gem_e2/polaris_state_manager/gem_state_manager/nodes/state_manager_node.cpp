@@ -16,8 +16,10 @@ class StateManagerNode
 {
 public:
     StateManagerNode() :
-        nh_{},
-        stateManager_(fromRosTime(ros::Time::now()))
+        nh_(),
+        pnh_("~"),
+        stateManager_(fromRosTime(ros::Time::now()),
+                      pnh_.param("state_timeout_ms", 0))
     {
         systemStatePub_ = nh_.advertise<gem_state_msgs::SystemStateStamped>("system_state", 10);
 
@@ -121,6 +123,7 @@ public:
     }
 private:
     ros::NodeHandle nh_;
+    ros::NodeHandle pnh_;
     StateManager stateManager_;
 
     ros::Subscriber batteryLevelSub_;
