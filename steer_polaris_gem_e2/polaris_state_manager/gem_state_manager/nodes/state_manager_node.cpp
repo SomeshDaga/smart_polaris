@@ -17,7 +17,7 @@ class StateManagerNode
 public:
     StateManagerNode() :
         nh_{},
-        stateManager_{}
+        stateManager_(fromRosTime(ros::Time::now()))
     {
         systemStatePub_ = nh_.advertise<gem_state_msgs::SystemStateStamped>("system_state", 10);
 

@@ -44,7 +44,7 @@ using SMState = State<SMStateT>;
 using SMStatePtr = StatePtr<SMStateT>;
 
 public:
-    StateManager(uint64_t stateDataTimeoutMs = 0);
+    StateManager(const Time& initTime, uint64_t stateDataTimeoutMs = 0);
 
     // Update functions
     void updateBatteryLevel(const Time& msgTime, float batteryLevel);

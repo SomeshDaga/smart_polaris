@@ -2,7 +2,7 @@
 
 using namespace polaris;
 
-StateManager::StateManager(uint64_t staleDataTimeoutMs)
+StateManager::StateManager(const Time& initTime, uint64_t staleDataTimeoutMs)
     : staleDataTimeoutMs_(staleDataTimeoutMs)
 {
     // Define all unique states
@@ -29,6 +29,11 @@ StateManager::StateManager(uint64_t staleDataTimeoutMs)
     states_.push_back(idleState);
     states_.push_back(runningState);
     states_.push_back(errorState);
+
+    // Initialize timing variables to the initialization time
+    timeLastGpsGood_ = initTime;
+    timeLastSignalConnected_ = initTime;
+    timeLastSignalLow_ = initTime;
 }
 
 // Update helpers
@@ -69,7 +74,9 @@ bool StateManager::isGpsBad() const
 { return gpsAccuracy_.data > Thresholds::GPS_BAD_ACCURACY; }
 
 bool StateManager::isGpsBadPersistent(const Time& now) const
-{ return isGpsBad() && (now - timeLastGpsGood_) > 15.0; }
+{
+    return isGpsBad() && (now - timeLastGpsGood_) > 15.0;
+}
 
 bool StateManager::isSignalLowPersistent(const Time& now) const
 {
