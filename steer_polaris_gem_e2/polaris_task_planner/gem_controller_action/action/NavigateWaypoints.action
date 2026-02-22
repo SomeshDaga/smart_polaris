@@ -1,0 +1,10 @@
+# Goal
+geometry_msgs/Pose2D[] waypoints
+uint64 start_index
+---
+# Result
+bool success
+---
+# Feedback
+uint64 target_index
+float32 progress

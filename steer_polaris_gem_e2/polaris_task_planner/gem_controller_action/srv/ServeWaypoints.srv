@@ -1,0 +1,6 @@
+# Service definition to serve waypoints for navigation
+# This is used by a high-level task planner that coordinates
+# execution of the waypoints with a low-level controller
+string waypoints_file
+---
+bool success

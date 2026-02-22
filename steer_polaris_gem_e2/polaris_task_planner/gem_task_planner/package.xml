@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>gem_task_planner</name>
+  <version>0.0.1</version>
+  <description>Provides node for high-level navigation task planner</description>
+
+  <maintainer email="someshdaga94@gmail.com">Somesh Daga</maintainer>
+  <license>Proprietary</license>
+  <author email="someshdaga94@gmail.com">Somesh Daga</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>rospy</depend>
+  <depend>gem_controller_action</depend>
+  <depend>gem_state_msgs</depend>
+</package>

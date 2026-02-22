@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>gem_pure_pursuit_sim_v2</name>
+  <version>1.0.0</version>
+  <description>Improved version of pure pursuit with action interface</description>
+
+  <author email="hangcui1201@gmail.com">Hang Cui</author>
+  <author email="someshdaga94@gmail.com">Somesh Daga</author>
+  <license>BSD</license>
+  <maintainer email="someshdaga94@gmail.com"> Hang Cui </maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>cv_bridge</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>ackermann_msgs</build_depend>
+  <build_depend>nav_msgs</build_depend>
+  <build_depend>visualization_msgs</build_depend>
+  <build_export_depend>cv_bridge</build_export_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>rospy</build_export_depend>
+  <build_export_depend>sensor_msgs</build_export_depend>
+  <build_export_depend>geometry_msgs</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+  <build_export_depend>ackermann_msgs</build_export_depend>
+  <build_export_depend>nav_msgs</build_export_depend>  
+  <build_export_depend>visualization_msgs</build_export_depend>  
+  <exec_depend>cv_bridge</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>ackermann_msgs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>  
+  <exec_depend>visualization_msgs</exec_depend>
+
+  <depend>gem_controller_action</depend>
+
+  <export>
+  </export>
+</package>
