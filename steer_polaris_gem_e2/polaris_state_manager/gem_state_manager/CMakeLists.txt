@@ -24,3 +24,11 @@ add_dependencies(state_manager_node ${catkin_EXPORTED_TARGETS})
 target_link_libraries(state_manager_node
   ${catkin_LIBRARIES}
 )
+
+# Rostest for state manager scenarios test
+if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
+  add_rostest_gtest(state_manager_scenarios test/state_manager_scenarios.test test/state_manager_scenarios.cpp)
+  target_link_libraries(state_manager_scenarios ${catkin_LIBRARIES})
+  add_dependencies(state_manager_scenarios ${catkin_EXPORTED_TARGETS})
+endif()

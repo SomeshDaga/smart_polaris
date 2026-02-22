@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- State manager node -->
+  <node pkg="gem_state_manager" type="state_manager_node" name="state_manager" output="screen"/>
+
+  <!-- Gtests for scenarios testing -->
+  <test test-name="state_manager_scenarios_test" time-limit="300.0" pkg="gem_state_manager" type="state_manager_scenarios" />
+</launch>
