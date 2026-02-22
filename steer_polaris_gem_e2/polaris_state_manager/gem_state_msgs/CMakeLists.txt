@@ -11,10 +11,10 @@ add_message_files(
     GpsAccuracyStamped.msg
     SignalStrengthStamped.msg
     SystemStateStamped.msg
+    TaskPlannerStatus.msg
     TemperatureStamped.msg)
 
 generate_messages(DEPENDENCIES std_msgs)
 
 catkin_package(
-  CATKIN_DEPENDS message_runtime std_msgs
-  DEPENDS Boost)
+  CATKIN_DEPENDS message_runtime std_msgs)

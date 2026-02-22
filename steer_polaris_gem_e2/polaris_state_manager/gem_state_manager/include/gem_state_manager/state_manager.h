@@ -1,3 +1,14 @@
+/**
+ * @file state_manager.h
+ * @brief Provides a ROS-agnostic state manager
+ *
+ * This class uses a state machine and defined event callbacks to update the
+ * active state of the state machine between IDLE, RUNNING and ERROR states
+ *
+ * It provides helper functions to update and query states of relevant data
+ * that determine the state
+ *
+ */
 #pragma once
 
 #include <gem_state_manager/state_machine.h>
@@ -9,6 +20,7 @@
 namespace polaris
 {
 
+// Important thresholds for signals
 namespace Thresholds
 {
     static constexpr float BATTERY_LOW = 0.5f;
@@ -16,14 +28,17 @@ namespace Thresholds
     static constexpr float GPS_BAD_ACCURACY = 200.f;
 }
 
+// Possible states that the state manager can transition between
 enum class SystemState {
     IDLE, RUNNING, ERROR
 };
 
+// Enum for signal strength quality
 enum class SignalStrength {
     NOT_CONNECTED, CONNECTED, LOW
 };
 
+// A templated class to capture any value and corresponding timestamp
 template <typename T>
 struct TimedData
 {
@@ -52,6 +67,7 @@ public:
     void updateGpsAccuracy(const Time& msgTime, float accuracy);
     void updateSignalStrength(const Time& msgTime, SignalStrength signal);
     void updateEmergencyStop(const Time& msgTime, bool enabled);
+    void updateHasTask(const Time& msgTime, bool hasTask);
 
     // Query helpers
     [[nodiscard]] bool isBatteryLow() const;
@@ -62,21 +78,26 @@ public:
     [[nodiscard]] bool isSignalNotConnectedPersistent(const Time& now) const;
     [[nodiscard]] bool isEstopEnabled() const;
     [[nodiscard]] bool isDataStale(const Time& now) const;
-    [[nodiscard]] bool isTaskRunning() const;
+    [[nodiscard]] bool isTaskActive() const;
 
     // Aggregated queries
     [[nodiscard]] bool hasError(const Time& now) const;
 
     [[nodiscard]] SystemState getSystemState() const;
 
+    /**
+    * @brief Update state machine state using current data and time
+    */
     void update(const Time& now);
 
 protected:
     StateMachine<SystemState> sm_;
-    std::vector<SMStatePtr> states_;
 
     // Staleness timeout (disabled if set to 0)
     const uint64_t staleDataTimeoutMs_;
+
+    // Task status
+    TimedData<bool> hasTask_ = {Time(), false};
 
     // Sensor data
     TimedData<float> batteryLevel_ = {Time(), Thresholds::BATTERY_LOW};

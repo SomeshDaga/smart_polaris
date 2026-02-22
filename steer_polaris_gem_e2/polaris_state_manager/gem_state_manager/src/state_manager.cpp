@@ -9,26 +9,25 @@ StateManager::StateManager(const Time& initTime, uint64_t staleDataTimeoutMs)
     auto idleState = std::make_shared<SMState>(sm_, SystemState::IDLE);
     auto runningState = std::make_shared<SMState>(sm_, SystemState::RUNNING);
     auto errorState = std::make_shared<SMState>(sm_, SystemState::ERROR);
+    // Register states with the state machine to manage their lifecycle
+    idleState->init();
+    runningState->init();
+    errorState->init();
 
     // Define transitions from the IDLE state
-    idleState->addTransition(runningState, [this](const Time& now) { return isTaskRunning() && !hasError(now); });
+    idleState->addTransition(runningState, [this](const Time& now) { return isTaskActive() && !hasError(now); });
     idleState->addTransition(errorState, [this](const Time& now) { return hasError(now); });
 
     // Define transitions from the RUNNING state
-    runningState->addTransition(idleState, [this](const Time& now) { return !isTaskRunning() && !hasError(now); });
+    runningState->addTransition(idleState, [this](const Time& now) { return !isTaskActive() && !hasError(now); });
     runningState->addTransition(errorState, [this](const Time& now) { return hasError(now); });
 
     // Define transitions from the ERROR state
-    errorState->addTransition(idleState, [this](const Time& now) { return !isTaskRunning() && !hasError(now); });
-    errorState->addTransition(runningState, [this](const Time& now) { return isTaskRunning() && !hasError(now); });
+    errorState->addTransition(idleState, [this](const Time& now) { return !isTaskActive() && !hasError(now); });
+    errorState->addTransition(runningState, [this](const Time& now) { return isTaskActive() && !hasError(now); });
 
     // Initialize state machine to the IDLE state
     sm_.initialize(idleState);
-
-    // Maintain lifetime of all states
-    states_.push_back(idleState);
-    states_.push_back(runningState);
-    states_.push_back(errorState);
 
     // Initialize timing variables to the initialization time
     timeLastGpsGood_ = initTime;
@@ -62,6 +61,9 @@ void StateManager::updateSignalStrength(const Time& msgTime, const SignalStrengt
 
 void StateManager::updateEmergencyStop(const Time& msgTime, const bool enabled)
 { estop_ = {msgTime, enabled}; }
+
+void StateManager::updateHasTask(const Time& msgTime, bool hasTask)
+{ hasTask_ = {msgTime, hasTask}; }
 
 // Query helpers
 bool StateManager::isBatteryLow() const
@@ -97,8 +99,8 @@ bool StateManager::isSignalNotConnectedPersistent(const Time& now) const
 bool StateManager::isEstopEnabled() const
 { return estop_.data; }
 
-bool StateManager::isTaskRunning() const
-{ return false; }
+bool StateManager::isTaskActive() const
+{ return hasTask_.data; }
 
 bool StateManager::isDataStale(const Time& now) const
 {

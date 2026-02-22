@@ -1,3 +1,10 @@
+/**
+ * @file time.h
+ * @brief Provides a ROS-agnostic Time class utilizing chrono-based time
+ *
+ * This class also provides operators to compute differences between time instances
+ * and compare two times
+ */
 #pragma once
 
 #include <chrono>
@@ -7,8 +14,8 @@ namespace polaris
 class Time
 {
 public:
-    using Clock      = std::chrono::system_clock;
-    using TimePoint  = Clock::time_point;
+    using Clock     = std::chrono::system_clock;
+    using TimePoint = Clock::time_point;
 
     explicit Time() : Time(TimePoint{})
     {}
@@ -27,7 +34,7 @@ public:
                    end.tp_ - start.tp_).count();
     }
 
-    // ===== Comparison Operators =====
+    // Comparison operators
     friend bool operator==(const Time& lhs,
                            const Time& rhs)
     {

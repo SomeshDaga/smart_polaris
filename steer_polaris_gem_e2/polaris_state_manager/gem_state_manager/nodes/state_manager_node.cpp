@@ -7,6 +7,7 @@
 #include <gem_state_msgs/SignalStrengthStamped.h>
 #include <gem_state_msgs/TemperatureStamped.h>
 #include <gem_state_msgs/SystemStateStamped.h>
+#include <gem_state_msgs/TaskPlannerStatus.h>
 
 #include <ros/ros.h>
 
@@ -28,6 +29,7 @@ public:
         gpsAccuracySub_ = nh_.subscribe("gps_accuracy", 10, &StateManagerNode::gpsAccuracyCb, this);
         signalStrengthSub_ = nh_.subscribe("signal_strength", 10, &StateManagerNode::signalStrengthCb, this);
         temperatureSub_ = nh_.subscribe("temperature", 10, &StateManagerNode::temperatureCb, this);
+        taskPlannerStatusSub_ = nh_.subscribe("task_planner_status", 10, &StateManagerNode::taskPlannerStatusCb, this);
     }
 
     void batteryLevelCb(const gem_state_msgs::BatteryLevelStamped::ConstPtr& msg)
@@ -67,11 +69,17 @@ public:
         stateManager_.updateTemperature(fromRosTime(msg->header.stamp), msg->temperature);
     }
 
+    void taskPlannerStatusCb(const gem_state_msgs::TaskPlannerStatus::ConstPtr& msg)
+    {
+        stateManager_.updateHasTask(fromRosTime(msg->header.stamp), msg->status != gem_state_msgs::TaskPlannerStatus::STATUS_NO_TASK);
+    }
+
     void publishSystemState(const Time& now)
     {
         gem_state_msgs::SystemStateStamped systemStateMsg;
         systemStateMsg.header.stamp = ros::Time::now();
 
+        // Add error codes to bitmask
         if (stateManager_.isBatteryLow())
         { systemStateMsg.error_code |= gem_state_msgs::SystemStateStamped::ERROR_BATTERY_LOW; }
 
@@ -93,6 +101,7 @@ public:
         if (stateManager_.isDataStale(now))
         { systemStateMsg.error_code |= gem_state_msgs::SystemStateStamped::ERROR_STALE_DATA; }
 
+        // Get overall system state
         switch (stateManager_.getSystemState())
         {
             case SystemState::IDLE:
@@ -131,6 +140,7 @@ private:
     ros::Subscriber gpsAccuracySub_;
     ros::Subscriber signalStrengthSub_;
     ros::Subscriber temperatureSub_;
+    ros::Subscriber taskPlannerStatusSub_;
 
     ros::Publisher systemStatePub_;
 };  // class StateManagerNode

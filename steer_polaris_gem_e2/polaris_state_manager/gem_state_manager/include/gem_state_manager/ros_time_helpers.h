@@ -5,6 +5,9 @@
 
 using namespace polaris;
 
+/**
+* @brief Helper function to convert from ros::Time to polaris::Time
+*/
 static Time fromRosTime(const ros::Time& t)
 {
     return Time(Time::TimePoint{} +
