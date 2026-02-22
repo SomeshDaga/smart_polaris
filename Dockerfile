@@ -61,17 +61,22 @@ RUN rosdep update --include-eol-distros
 COPY polaris_gem_e2 /home/ros/polaris_ws/src
 COPY steer_polaris_gem_e2 /home/ros/steer_polaris_ws/src
 
-# Build the workspace
+# Install catkin tools for friendlier workspace management
+RUN apt install -y python3-catkin-tools
+
+# Build the workspace (build with Release flag for prod builds)
 WORKDIR /home/ros/polaris_ws
 RUN bash -c "source /opt/ros/noetic/setup.bash && \
 	rosdep install --from-paths src --ignore-src -y && \
-	catkin_make"
+	CMAKE_BUILD_TYPE=$([ \"$BUILD_DEV_IMAGE\" = \"true\" ] && echo Debug || echo Release) && \
+	catkin build --cmake-args -DCMAKE_BUILD_TYPE=\${CMAKE_BUILD_TYPE}"
 
 WORKDIR /home/ros/steer_polaris_ws
 RUN bash -c "source /opt/ros/noetic/setup.bash && \
 	source /home/ros/polaris_ws/devel/setup.bash && \
 	rosdep install --from-paths src --ignore-src -y && \
-	catkin_make"
+	CMAKE_BUILD_TYPE=$([ \"$BUILD_DEV_IMAGE\" = \"true\" ] && echo Debug || echo Release) && \
+	catkin build --cmake-args -DCMAKE_BUILD_TYPE=\${CMAKE_BUILD_TYPE}"
 
 # Ensure entrypoint script is executable by our ros user
 # which will be the default user during runtime
