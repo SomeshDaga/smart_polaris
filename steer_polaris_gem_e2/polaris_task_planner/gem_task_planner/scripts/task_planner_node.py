@@ -17,6 +17,7 @@ import actionlib
 
 from actionlib_msgs.msg import GoalStatus
 from geometry_msgs.msg import Pose2D
+from std_srvs.srv import Empty, EmptyRequest, EmptyResponse
 
 from gem_state_msgs.msg import (
     SystemStateStamped,
@@ -94,6 +95,13 @@ class TaskPlannerNode:
             self.handle_serve_waypoints
         )
 
+        # Add another service to request cancellation of any pending/active task
+        self.cancel_tasks_service = rospy.Service(
+            'cancel_tasks',
+            Empty,
+            self.handle_cancel_tasks
+        )
+
         # Allow auto-starting a goal on node startup if a ros param is set
         # with the waypoint file to use
         waypoint_file = rospy.get_param("waypoint_file", None)
@@ -136,6 +144,11 @@ class TaskPlannerNode:
         if self.task and self.is_task_active():
             self.client.cancel_goal()
         # We not reset the current task
+
+    def handle_cancel_tasks(self, req: EmptyRequest) -> EmptyResponse:
+        with self.lock:
+            self.cancel_task()
+        return EmptyResponse()
 
     def cancel_task(self) -> None:
         """
@@ -211,11 +224,12 @@ class TaskPlannerNode:
         In turn, this will allow to later resume a task from its latest state
         """
         with self.lock:
-            rospy.loginfo(f"Navigation progress: {int(feedback.progress * 100)}%")
-            # Cache the currently tracked index for the list of waypoints
-            # This is useful if we have to preempt the navigation goal due to system errors
-            # and resume later
-            self.task.start_index = feedback.target_index
+            if self.task:
+                rospy.loginfo(f"Navigation progress: {int(feedback.progress * 100)}%")
+                # Cache the currently tracked index for the list of waypoints
+                # This is useful if we have to preempt the navigation goal due to system errors
+                # and resume later
+                self.task.start_index = feedback.target_index
 
     def done_callback(self, status: GoalStatus, result: NavigateWaypointsResult) -> None:
         """
