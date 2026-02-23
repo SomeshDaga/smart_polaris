@@ -1,0 +1,10 @@
+\subsubsection parameters ROS parameters
+
+Reads and maintains the following parameters on the ROS server
+
+- \b "~estop_enabled" : \b [bool] Estop enabled min: False, default: False, max: True
+- \b "~battery_level" : \b [int] Battery Level (%) min: 0, default: 80, max: 100
+- \b "~gps_accuracy" : \b [double] GPS Accuracy (mm) min: 0.0, default: 100.0, max: 300.0
+- \b "~signal_strength" : \b [int] Network Status min: 2, default: 0, max: 2147483647
+- \b "~temperature" : \b [double] Temperature (deg C) min: 0.0, default: 30.0, max: 100.0
+
