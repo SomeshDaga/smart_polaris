@@ -109,13 +109,15 @@ class TaskPlannerNode:
         :param waypoints_file: Filename for waypoints file (relative to package://gem_task_planner/waypoints/)
         :return: Task object (represents goal to action server)
         """
-        dirname  = os.path.dirname(__file__)
-        filename = os.path.join(dirname, f'../waypoints/{waypoints_file}')
+
+        if not os.path.isabs(waypoints_file):
+            dirname  = os.path.dirname(__file__)
+            waypoints_file = os.path.join(dirname, f'../waypoints/{waypoints_file}')
 
         task = NavigateWaypointsGoal()
         task.start_index = 0
         try:
-            with open(filename) as f:
+            with open(waypoints_file) as f:
                 poses = [tuple(line) for line in csv.reader(f)]
                 for p in poses:
                     task.waypoints.append(Pose2D(float(p[0]), float(p[1]), float(p[2])))
@@ -176,7 +178,7 @@ class TaskPlannerNode:
         """
         Subscriber callback to /system_state to pause/resume tasks
         When the system transitions to an ERROR state, tasks are paused
-        When the system transitions out of an ERROR state, tasks are resumed
+        otherwise we resume tasks
         """
         with self.lock:
             state = msg.state
@@ -184,7 +186,7 @@ class TaskPlannerNode:
             if state != self.last_system_state:
                 if state == SystemStateStamped.STATE_ERROR:
                     self.pause_tasks()
-                elif self.last_system_state == SystemStateStamped.STATE_ERROR:
+                else:
                     self.resume_task()
 
             self.last_system_state = state
