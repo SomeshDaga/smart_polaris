@@ -50,6 +50,18 @@
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
 
+  <exec_depend>gem_controller_action</exec_depend>
+  <exec_depend>gem_integration_tests</exec_depend>
+  <exec_depend>gem_state_manager</exec_depend>
+  <exec_depend>gem_state_msgs</exec_depend>
+  <exec_depend>gem_task_planner</exec_depend>
+  <exec_depend>gem_pure_pursuit_sim_v2</exec_depend>
+  <exec_depend>gazebo_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>dynamic_reconfigure</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>rospkg</exec_depend>
+  <exec_depend>std_srvs</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

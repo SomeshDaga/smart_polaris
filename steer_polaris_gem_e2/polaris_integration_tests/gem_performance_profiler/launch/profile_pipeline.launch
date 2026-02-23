@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Performance profiling pipeline: state_manager, task_planner, mock_state_signals, pure_pursuit_sim.
+       No Gazebo; a fake /gazebo/get_model_state service is provided. -->
+
+  <arg name="waypoints_file" default="$(find gem_integration_tests)/config/wps.csv"/>
+  <param name="waypoints_file" value="$(arg waypoints_file)"/>
+
+  <!-- Fake Gazebo GetModelState (required by controller_action_interface) -->
+  <node name="fake_get_model_state" pkg="gem_performance_profiler" type="fake_get_model_state_node.py" output="screen"/>
+
+  <!-- State manager: subscribes to battery_level, estop, gps_accuracy, signal_strength, temperature, task_planner_status -->
+  <node name="state_manager" pkg="gem_state_manager" type="state_manager_node" output="screen"/>
+
+  <!-- Mock state signals (reconfigurable via dynamic_reconfigure) -->
+  <node name="mock_state_signals_node" pkg="gem_integration_tests" type="mock_state_signals_node.py" output="screen"/>
+
+  <!-- Pure pursuit controller (navigate_waypoints action server) -->
+  <node name="pure_pursuit_sim" pkg="gem_pure_pursuit_sim_v2" type="pure_pursuit_sim.py" output="screen"/>
+
+  <!-- Task planner: serve_waypoints service, task_planner_status, navigate_waypoints action -->
+  <node name="task_planner" pkg="gem_task_planner" type="task_planner_node.py" output="screen"/>
+</launch>
