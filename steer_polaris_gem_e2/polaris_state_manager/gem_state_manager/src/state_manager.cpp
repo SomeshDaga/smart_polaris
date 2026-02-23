@@ -32,7 +32,6 @@ StateManager::StateManager(const Time& initTime, uint64_t staleDataTimeoutMs)
     // Initialize timing variables to the initialization time
     timeLastGpsGood_ = initTime;
     timeLastSignalConnected_ = initTime;
-    timeLastSignalLow_ = initTime;
 }
 
 // Update helpers
@@ -55,8 +54,6 @@ void StateManager::updateSignalStrength(const Time& msgTime, const SignalStrengt
 
     if (signal == SignalStrength::CONNECTED)
     { timeLastSignalConnected_ = msgTime; }
-    else if (signal == SignalStrength::LOW)
-    { timeLastSignalLow_ = msgTime; }
 }
 
 void StateManager::updateEmergencyStop(const Time& msgTime, const bool enabled)
@@ -82,10 +79,10 @@ bool StateManager::isGpsBadPersistent(const Time& now) const
 
 bool StateManager::isSignalLowPersistent(const Time& now) const
 {
-    // the signal is considered persistently low if the signal is low
+    // the signal is considered persistently low if the signal is low/disconnected
     // for > 20 seconds
     return signalStrength_.data == SignalStrength::LOW &&
-        now - std::max(timeLastSignalConnected_, timeLastSignalLow_) > 20.0;
+        now - timeLastSignalConnected_ > 20.0;
 }
 
 bool StateManager::isSignalNotConnectedPersistent(const Time& now) const

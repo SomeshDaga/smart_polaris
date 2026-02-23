@@ -108,7 +108,6 @@ protected:
 
     TimedData<SignalStrength> signalStrength_ = {Time(), SignalStrength::CONNECTED};
     Time timeLastSignalConnected_;
-    Time timeLastSignalLow_;
 
     TimedData<bool> estop_ = {Time(), false};
 };
