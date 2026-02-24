@@ -19,47 +19,53 @@ roslaunch gem_performance_profiler profile_pipeline.launch waypoints_file:=$(fin
 
 ### 2. Run the error-timing profiler (in another terminal)
 
+**Scenarios:**
+- **run_to_error** (default): System in RUNNING → inject error → wait ERROR → record for `ROSBAG_DURATION_AFTER_ERROR` then stop. Evaluates reaction to fault.
+- **error_to_run**: System in RUNNING → inject error → wait ERROR → clear error → wait RUNNING again (system + task + ackermann speed > 0) → record for `ROSBAG_DURATION_AFTER_ERROR` then stop. Evaluates recovery.
+
+Both use the same `ROSBAG_STARTUP_DELAY` and `ROSBAG_DURATION_AFTER_ERROR` (see `profiler_scenarios.py`).
+
 With a **specific test directory**:
 
 ```bash
 docker exec -it steerai_dev bash
 source /opt/ros/noetic/setup.bash && source /home/ros/steer_polaris_ws/devel/setup.bash
-rosrun gem_performance_profiler run_error_timing_profiler.py --test-dir /tmp/my_profile
+rosrun gem_performance_profiler run_error_timing_profiler.py --scenario run_to_error --test-dir /tmp/my_profile
+rosrun gem_performance_profiler run_error_timing_profiler.py --scenario error_to_run --test-dir /tmp/my_recovery
 ```
 
 With a **dynamically created** test directory (timestamped; path is printed):
 
 ```bash
-rosrun gem_performance_profiler run_error_timing_profiler.py
+rosrun gem_performance_profiler run_error_timing_profiler.py --scenario run_to_error
 ```
 
 Optional: `--runs N` to use N runs per signal (default 100).
 
 ### Output layout
 
-- **Test directory** (e.g. `/tmp/my_profile` or `profile_YYYYMMDD_HHMMSS`):
+- **Test directory** (e.g. `/tmp/my_profile` or `profile_run_to_error_YYYYMMDD_HHMMSS`):
+  - `estop/run_001.bag` … `run_100.bag`
   - `battery_level/run_001.bag` … `run_100.bag`
-  - `temperature/run_001.bag` … `run_100.bag`
-  - `gps_accuracy/run_001.bag` … `run_100.bag`
-  - `network_strength_low_signal/run_001.bag` … `run_100.bag`
-  - `network_strength_not_connected/run_001.bag` … `run_100.bag`
+  - … (one subdir per signal)
 
-Each run: system starts IDLE → task planner put in RUNNING → error injected for that signal → rosbag recorded until N seconds past the error (see script for per-signal durations).
+Each run: IDLE → start bag → startup delay → RUNNING → (inject error → ERROR) and for error_to_run then (clear error → RUNNING again) → sleep → stop bag.
 
 ### 3. Analyze rosbags (after profiling)
 
-From a test directory containing signal subdirs and `run_*.bag` files:
+From a test directory containing signal subdirs and `run_*.bag` files. **Match `--scenario` to how the bags were recorded.**
 
 ```bash
-rosrun gem_performance_profiler analyze_rosbags.py /path/to/test_dir [--output-dir /path/to/output]
+rosrun gem_performance_profiler analyze_rosbags.py /path/to/test_dir --scenario run_to_error [--output-dir /path/to/output]
+rosrun gem_performance_profiler analyze_rosbags.py /path/to/recovery_dir --scenario error_to_run [--output-dir /path/to/output]
 ```
 
 **Requires:** `pandas`, `matplotlib`, `numpy` (e.g. `pip install pandas matplotlib numpy`).
 
 **Outputs** (in `test_dir` or `--output-dir`):
-- **event_times_and_latencies.csv** — one row per bag: columns for time of error injection, time `/system_state` goes to ERROR, time `/task_planner_status` goes to PAUSED, time `/navigate_waypoints/status` shows PREEMPTED, time `/gem/ackermann_cmd` shows zero speed, plus latency columns (each event time minus error injection time).
-- **latency_statistics.txt** — for each event column: number of valid instances (success rate %), mean reaction time (s), std (s), 95th percentile (s) w.r.t. error-inducing message timestamp.
-- **histogram_*.png** — histogram of latency for each event (overall and per-signal).
+
+- **run_to_error:** `event_times_and_latencies_run_to_error.csv` — columns: time_error_injection, time_system_state_error, time_task_planner_paused, time_nav_preempted, time_ackermann_zero, plus latency_* w.r.t. time_error_injection. `latency_statistics_run_to_error.txt`, `run_to_error_histogram_*.png`.
+- **error_to_run:** `event_times_and_latencies_error_to_run.csv` — columns: time_error_cleared, time_system_state_running, time_task_planner_running, time_nav_active, time_ackermann_positive, plus latency_* w.r.t. time_error_cleared. `latency_statistics_error_to_run.txt`, `error_to_run_histogram_*.png`.
 
 Times use message `header.stamp` when available, otherwise the bag-assigned time.
 
@@ -67,6 +73,7 @@ Times use message `header.stamp` when available, otherwise the bag-assigned time
 
 | Signal | Mock config change | State manager error (after persistence where applicable) |
 |--------|---------------------|------------------------------------------------------------|
+| estop | estop_enabled = true | ERROR_ESTOP (immediate) |
 | battery_level | battery_level = 49% | ERROR_BATTERY_LOW (immediate) |
 | temperature | temperature = 60°C | ERROR_TEMPERATURE_HIGH (immediate) |
 | gps_accuracy | gps_accuracy = 201 mm | ERROR_GPS_LOST (bad > 15 s) |

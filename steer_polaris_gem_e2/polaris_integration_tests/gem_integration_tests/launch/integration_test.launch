@@ -7,6 +7,7 @@
   <arg name="use_rqt_reconfigure" default="$(arg use_gui)"/>
   <arg name="robot_name" default="gem"/>
 
+  <arg name="wait_for_nav_goal" default="false"/>
   <!-- Waypoints file: use integration test config (absolute path supported by task_planner) -->
   <arg name="waypoints_file" default="$(find gem_integration_tests)/config/wps.csv"/>
 
@@ -39,7 +40,7 @@
 
   <!-- Task planner: serve_waypoints service, publishes task_planner_status, uses navigate_waypoints action -->
   <node name="task_planner" pkg="gem_task_planner" type="task_planner_node.py" output="screen">
-    <param name="waypoint_file" value="$(arg waypoints_file)"/>
+    <param name="waypoint_file" value="$(arg waypoints_file)" unless="$(arg wait_for_nav_goal)"/>
   </node>
 
   <!-- Status overlay for RViz (action status, system_state, task_planner_status, signals, ackermann speed) -->

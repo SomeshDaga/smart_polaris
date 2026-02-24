@@ -391,7 +391,7 @@ def compute_and_save_stats(df, output_path, scenario, time_ref_name):
                     idx_max = sub_df[lat_col].idxmax()
                     bag_min = os.path.basename(sub_df.loc[idx_min, "bag"])
                     bag_max = os.path.basename(sub_df.loc[idx_max, "bag"])
-                    lines.append("    {}: success rate: {:.1f}%, min={:.4f} ({}), max={:.4f} ({}), mean={:.4f}, 50%={:.4f}, 99%={:.4f} seconds (n={})".format(
+                    lines.append("    {}: success rate: {:.1f}%, min={:.4f} ({}), max={:.4f} ({}), mean={:.4f}, 50%={:.4f}, 95%={:.4f}, 99%={:.4f}, std={:.4f} seconds (n={})".format(
                         sig,
                         pct,
                         sub_df[lat_col].min(),
@@ -400,7 +400,9 @@ def compute_and_save_stats(df, output_path, scenario, time_ref_name):
                         bag_max,
                         sub_df[lat_col].mean(),
                         np.nanpercentile(sub_df[lat_col], 50),
+                        np.nanpercentile(sub_df[lat_col], 95),
                         np.nanpercentile(sub_df[lat_col], 99),
+                        sub_df[lat_col].std(),
                         len(sub_df),
                     ))
                 else:
@@ -466,7 +468,7 @@ def _set_histogram_axis_ticks(ax, x_min, x_max, min_tick_s=MIN_TICK_RESOLUTION_S
         base_size = float(plt.rcParams.get("xtick.labelsize", 10))
     except (TypeError, ValueError):
         base_size = 10.0
-    ax.tick_params(axis="x", labelsize=base_size * 0.5)
+    ax.tick_params(axis="x", labelsize=base_size * 0.85)
 
 
 def plot_histograms(df, output_dir, scenario):

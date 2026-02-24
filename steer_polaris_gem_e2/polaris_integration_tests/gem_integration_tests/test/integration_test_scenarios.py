@@ -68,6 +68,8 @@ class IntegrationTestScenarios(unittest.TestCase):
         """
         # Apply good signals for the state manager
         self._set_good_mock_config()
+        rospy.sleep(1.)
+        rospy.loginfo(f"system state = {self._get_system_state()}")
         self.assertTrue(
             self._poll_until(
                 lambda: self._get_system_state() == SystemStateStamped.STATE_IDLE,

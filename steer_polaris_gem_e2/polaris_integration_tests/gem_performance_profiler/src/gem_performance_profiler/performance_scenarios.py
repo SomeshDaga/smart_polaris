@@ -40,7 +40,7 @@ WAIT_ERROR_TIMEOUT = {
     "network_strength_low_signal": 20.0 + DEFAULT_WAIT_ERROR_TIMEOUT,
     "network_strength_not_connected": 10.0 + DEFAULT_WAIT_ERROR_TIMEOUT,
 }
-WAIT_RUNNING_AFTER_RECOVERY_TIMEOUT = 30.0
+WAIT_RUNNING_AFTER_RECOVERY_TIMEOUT = 5.0
 
 POLL_PERIOD = 0.2
 MOCK_RECONF_NODE = "/mock_state_signals_node"
