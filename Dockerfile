@@ -35,7 +35,10 @@ RUN DEBIAN_FRONTEND=noninteractive apt install -y ros-noetic-ackermann-msgs \
 	ros-noetic-ros-controllers \
 	ros-noetic-velodyne-simulator \
 	ros-noetic-velodyne-simulator \
-        libopencv-dev
+        libopencv-dev \
+        ros-noetic-rqt \
+	ros-noetic-rqt-common-plugins \
+        ros-noetic-rviz
 
 # Copy custom rosdep rules to skip bad dependencies from the polaris_gem_e2 workspace
 COPY resources/rosdep-skip.yaml /etc/ros/rosdep/
@@ -62,7 +65,7 @@ COPY polaris_gem_e2 /home/ros/polaris_ws/src
 COPY steer_polaris_gem_e2 /home/ros/steer_polaris_ws/src
 
 # Install catkin tools for friendlier workspace management
-RUN apt install -y python3-catkin-tools
+RUN apt install -y python3-catkin-tools python3-rospkg python3-catkin-pkg
 
 # Build the workspace (build with Release flag for prod builds)
 WORKDIR /home/ros/polaris_ws
@@ -78,6 +81,10 @@ RUN bash -c "source /opt/ros/noetic/setup.bash && \
 	CMAKE_BUILD_TYPE=$([ \"$BUILD_DEV_IMAGE\" = \"true\" ] && echo Debug || echo Release) && \
 	catkin build --cmake-args -DCMAKE_BUILD_TYPE=\${CMAKE_BUILD_TYPE}"
 
+# Install pip and some packages for performance profiler scripts
+RUN apt install -y python3-pip
+RUN pip3 install numpy pandas matplotlib
+
 # Ensure entrypoint script is executable by our ros user
 # which will be the default user during runtime
 RUN chown ros:ros /entrypoint.sh && chown -R ros:ros /home/ros/polaris_ws && chown -R ros:ros /home/ros/steer_polaris_ws
@@ -91,7 +98,7 @@ RUN if [ "$BUILD_DEV_IMAGE" = "true" ]; then \
 USER ros
 # Update rosdeps
 RUN rosdep update --include-eol-distros
-WORKDIR /home/ros
+WORKDIR /home/ros/steer_polaris_ws
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["bash"]

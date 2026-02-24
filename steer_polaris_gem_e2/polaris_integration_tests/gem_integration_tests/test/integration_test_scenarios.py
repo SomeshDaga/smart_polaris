@@ -48,6 +48,7 @@ class IntegrationTestScenarios(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         rospy.init_node("integration_test_scenarios", anonymous=False)
+        rospy.sleep(5.)
         cls._waypoints_file = rospy.get_param(WAYPOINTS_FILE_PARAM)
         if not os.path.isabs(cls._waypoints_file):
             cls._waypoints_file = os.path.abspath(cls._waypoints_file)
@@ -204,7 +205,7 @@ class IntegrationTestScenarios(unittest.TestCase):
         )
         rospy.loginfo("System in RUNNING state")
 
-       # Check Task Planner has moved to a RUNNING state
+        # Check Task Planner has moved to a RUNNING state
         task_status = self._get_task_status()
         self.assertEqual(
             task_status,
@@ -221,6 +222,7 @@ class IntegrationTestScenarios(unittest.TestCase):
         rospy.loginfo("Controller goal has been reinstated")
 
         # Check robot velocity is non-zero
+        rospy.sleep(1.)
         robot_speed = self._get_ackermann_speed()
         self.assertTrue(robot_speed > 0., "Robot speed must be non-zero")
         rospy.loginfo("Robot speed is non-zero i.e. running navigation")
@@ -319,6 +321,7 @@ class IntegrationTestScenarios(unittest.TestCase):
         rospy.loginfo("Controller goal has been reinstated")
     
         # Check robot velocity is non-zero
+        rospy.sleep(1.)
         robot_speed = self._get_ackermann_speed()
         self.assertTrue(robot_speed > 0., "Robot speed must be non-zero")
         rospy.loginfo("Robot speed is non-zero i.e. running navigation")

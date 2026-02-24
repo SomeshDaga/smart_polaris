@@ -104,10 +104,15 @@ class TaskPlannerNode:
 
         # Allow auto-starting a goal on node startup if a ros param is set
         # with the waypoint file to use
-        waypoint_file = rospy.get_param("waypoint_file", None)
+        waypoint_file = rospy.get_param("~waypoint_file", None)
         if waypoint_file:
-            task = load_task_from_waypoint_file(waypoint_file)
+            rospy.loginfo("Got waypoint file: %s", waypoint_file)
+            task = TaskPlannerNode.load_task_from_waypoint_file(waypoint_file)
             if task: self.start_task(task)
+            else:
+                rospy.logerr("Failed to load waypoints from file: %s", waypoint_file)
+        else:
+            rospy.loginfo("No waypoint file provided, will wait for serve_waypoints service to be called")
 
     @staticmethod
     def load_task_from_waypoint_file(waypoints_file: str) -> Optional[Task]:
@@ -117,6 +122,7 @@ class TaskPlannerNode:
         :param waypoints_file: Filename for waypoints file (relative to package://gem_task_planner/waypoints/)
         :return: Task object (represents goal to action server)
         """
+        if not waypoints_file: return None
 
         if not os.path.isabs(waypoints_file):
             dirname  = os.path.dirname(__file__)

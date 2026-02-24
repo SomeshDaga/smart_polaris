@@ -39,8 +39,7 @@
 
   <!-- Task planner: serve_waypoints service, publishes task_planner_status, uses navigate_waypoints action -->
   <node name="task_planner" pkg="gem_task_planner" type="task_planner_node.py" output="screen">
-    <!-- Optional: auto-load waypoints on startup; tests typically call serve_waypoints with waypoints_file -->
-    <!-- <param name="waypoint_file" value="$(arg waypoints_file)"/> -->
+    <param name="waypoint_file" value="$(arg waypoints_file)"/>
   </node>
 
   <!-- Status overlay for RViz (action status, system_state, task_planner_status, signals, ackermann speed) -->

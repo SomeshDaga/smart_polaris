@@ -2,3 +2,7 @@
 # This was listed as a dependency in polaris_gem_e2
 opencv3:
   ubuntu: []
+rospkg:
+  ubuntu: []
+catkin_pkg:
+  ubuntu: []

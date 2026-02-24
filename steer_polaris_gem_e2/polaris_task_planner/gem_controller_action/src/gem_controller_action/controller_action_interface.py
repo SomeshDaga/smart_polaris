@@ -14,7 +14,7 @@ This module implements the following common functionalities for path tracking co
 """
 from abc import ABC, abstractmethod
 import numpy as np
-from typing import NamedTuple, List
+from typing import NamedTuple, List, Optional
 
 import rospy
 import actionlib
@@ -83,7 +83,7 @@ class ControllerActionInterface(ABC):
         self._action_server.start()
 
     @staticmethod
-    def get_gem_state() -> RobotState:
+    def get_gem_state() -> Optional[RobotState]:
         """
         Gets the robot state (pose and velocity) from gazebo
         """      
@@ -92,6 +92,7 @@ class ControllerActionInterface(ABC):
             model_state = service_response(model_name='gem')
         except rospy.ServiceException as exc:
             rospy.loginfo("Service did not process request: " + str(exc))
+            return None
 
         x = model_state.pose.position.x
         y = model_state.pose.position.y
@@ -126,7 +127,11 @@ class ControllerActionInterface(ABC):
             # Get the controller state. This includes the commands to send to the robot
             # and the target index and the longitudinal distance to that target index
             # The distance is positive if the target is ahead of the robot, otherwise negative
-            controller_state = self.control_step(ControllerActionInterface.get_gem_state(), next_waypoint_idx)
+            robot_state = ControllerActionInterface.get_gem_state()
+            if robot_state is None:
+                rospy.logerr("Failed to get robot state, skipping control step")
+                continue
+            controller_state = self.control_step(robot_state, next_waypoint_idx)
 
             # Check if goal has been achieved by checking if the target index is the last waypoint
             # and the dist_to_target is negative (i.e. robot has crossed the last waypoint)

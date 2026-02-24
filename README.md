@@ -15,6 +15,12 @@ The docker image can be built by running:
     docker build -t steerai:prod .
     ```
 
+# TODO
+
+Install 'pip'
+Install 'pip install numpy matplotlib pandas'
+Install 'ros-noetic-rqt ros-${ROS_DISTRO}-rqt-common-plugin  ros-noetic-rqt-rviz'
+
 ### Launch application
 
 To render the gazebo simulation, we have to do the following:
