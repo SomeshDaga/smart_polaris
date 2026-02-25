@@ -6,6 +6,8 @@ Additionally, rostests and integration tests are introduced to evaluate the impa
 
 > **Note**: This project has been tested inside an ARM64 Ubuntu 24.04 Virtual Machine running on VMWare Fusion 13
 
+[Demo Video](https://drive.google.com/file/d/1TmW5SiZ79Af1DCApRZ5VKem64JGAmrPl/view?usp=drive_link)
+
 ## Project Setup
 
 For first time setup, please clone this repository and resolve submodules using:
