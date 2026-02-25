@@ -48,7 +48,6 @@ class IntegrationTestScenarios(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         rospy.init_node("integration_test_scenarios", anonymous=False)
-        rospy.sleep(5.)
         cls._waypoints_file = rospy.get_param(WAYPOINTS_FILE_PARAM)
         if not os.path.isabs(cls._waypoints_file):
             cls._waypoints_file = os.path.abspath(cls._waypoints_file)

@@ -14,7 +14,7 @@
   <arg name="waypoints_file" default="$(find gem_integration_tests)/config/wps.csv"/>
 
   <!-- Bring up Gazebo (disable default RViz since we use our own RViz config) -->
-  <include file="$(find gem_gazebo)/launch/gem_gazebo_rviz.launch">
+  <include file="$(find gem_integration_tests)/launch/gem_gazebo_rviz.launch">
     <arg name="robot_name" value="$(arg robot_name)"/>
     <arg name="paused" value="$(arg paused)"/>
     <arg name="gui" value="$(arg use_gui)"/>
