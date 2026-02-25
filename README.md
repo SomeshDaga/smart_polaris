@@ -50,6 +50,8 @@ The high-level structure of the repository is as follows:
 
 As previously mentioned, two types of docker image building is supported for this project: Development and Production.
 
+Additionally, the base docker image was carefully chosen, with upstream docker repositories supporting both ARM64 and AMD64 architectures for the image. Hence, the Dockerfile should work out-of-the-box on both system architectures.
+
 #### Development Images
 
 Features of the development images:
@@ -576,17 +578,34 @@ This also allowed for the use of the `rqt_reconfigure` plugin with `rqt` to inte
 
 For performance profiling methodology and results, please refer to [Performance Report](https://docs.google.com/document/d/1WDdFwSpNwf5ZT2EGFDyTaDiJ88Gau3d0w6FHBD62BJQ/edit?usp=drivesdk).
 
+> Future Improvement: Scenarios tests from `gem_integration_tests` can be reused for generating data for measuring profiling performance.
+
 ## Challenges Encountered
 
 ### ARM64-based development on Virtual Machine
 
+During development, I did not have access to a Linux machine. Instead, I used a Macbook M1 Pro that uses an ARM64 architecture.
 
+ROS 1 support is non-existent for non-linux machines. Therefore, I decided to use VMWare Fusion on my Macbook to run an Ubuntu VM.
 
-### ROS 1 End-of-Life
+Ubuntu Desktop ISOs for ARM64 prior to Ubuntu 24.04 are also not readily available in official repositories (mainly server ISOs exist). My initial goal was to work with a Ubuntu 20.04 system to allow for "local" development, and later packaged via docker.
+
+In the end, I got around this challenge by developing a Dockerfile that is applicable to both development and production goals. With the development images, I was able to bind mount ROS workspaces from the host VM system into the containers.
+
+### ARM64 ROS 1 Docker Images
+
+Additionally, I found that `osrf` maintains the ROS 1 full desktop images (with Gazebo and other gui tools included), but only for AMD64 distributions.
+
+There were unofficial packages available for ARM64 platforms [seunmul/ros:noetic-full-arm64](https://hub.docker.com/layers/seunmul/ros/noetic-full-arm64/images/sha256-506e41fbe11809e0d1a89d49284fdf4904f18f8079bdf13f11424eca96c761a4?context=explore).
+
+However, I wanted the Dockerfile to be reusable across all system architectures and opted to use official docker images from `ros` with less vulnerabilities and amd64 + arm64 support. I opted to install additional dependencies manually inside the Dockerfile e.g. for Gazebo.
 
 ### Profiling Bugs and Iteration
 
-### 
+For profiling system performance across a number of failure scenarios, I wanted to run each failure scenario for each signal a large number of times; in order to generate a representative statistical distribution of system response times for analysis.
 
+This is a time consuming process, especially with prolonged time-based failure conditions for `/gps_accuracy` and `/signal_strength`.
 
+Initially, I approached it by aggregating metrics during the simulation of failure scenarios. However, this led to a loss of raw data and inflexibility to tweak analysis of the data, thereby needing to repeat experimental runs.
 
+I switched to the better approach of performing rosbag records of each simulated scenario and performing the analysis offline. Even with this approach, I ran into issues with `rosbag record` missing messages (extent depending on order of topic subscription) during its startup. This was identified by inspecting rosbag files with the `rqt_bag` plugin. Hence, this approach also offered between debugging and introspection capabilities.
