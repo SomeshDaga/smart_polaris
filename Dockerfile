@@ -11,6 +11,8 @@ ARG GID=1000
 # ROS 1 has reached end-of-life
 # Disable warnings
 ENV DISABLE_ROS1_EOL_WARNINGS=1
+# Prevent bytecode .pyc files from polluting the filesystem
+ENV PYTHONDONTWRITEBYTECODE=1
 
 # Install standard tools
 RUN apt update && apt install -y wget
@@ -51,10 +53,10 @@ RUN groupadd -g $GID ros && \
     useradd -m -u $UID -g $GID ros
 
 # Copy our entrypoint script
-COPY scripts/entrypoint.sh /
+COPY entrypoint.sh /
 
 # Create workspace directories for our code
-RUN mkdir -p /home/ros/polaris_ws/src && mkdir -p /home/ros/steer_polaris_ws/src
+RUN mkdir -p /home/ros/polaris_ws/src && mkdir -p /home/ros/smart_polaris_ws/src
 
 # Update rosdeps prior to rosdep install
 RUN rosdep update --include-eol-distros
@@ -62,7 +64,7 @@ RUN rosdep update --include-eol-distros
 # Copy the polaris_gem_e2 packages into the polaris workspace
 # Note: For development, we will bind mount directories from the host
 COPY polaris_gem_e2 /home/ros/polaris_ws/src
-COPY steer_polaris_gem_e2 /home/ros/steer_polaris_ws/src
+COPY smart_polaris_gem_e2 /home/ros/smart_polaris_ws/src
 
 # Install catkin tools for friendlier workspace management
 RUN apt install -y python3-catkin-tools python3-rospkg python3-catkin-pkg
@@ -74,7 +76,7 @@ RUN bash -c "source /opt/ros/noetic/setup.bash && \
 	CMAKE_BUILD_TYPE=$([ \"$BUILD_DEV_IMAGE\" = \"true\" ] && echo Debug || echo Release) && \
 	catkin build --cmake-args -DCMAKE_BUILD_TYPE=\${CMAKE_BUILD_TYPE}"
 
-WORKDIR /home/ros/steer_polaris_ws
+WORKDIR /home/ros/smart_polaris_ws
 RUN bash -c "source /opt/ros/noetic/setup.bash && \
 	source /home/ros/polaris_ws/devel/setup.bash && \
 	rosdep install --from-paths src --ignore-src -y && \
@@ -87,7 +89,7 @@ RUN pip3 install numpy pandas matplotlib
 
 # Ensure entrypoint script is executable by our ros user
 # which will be the default user during runtime
-RUN chown ros:ros /entrypoint.sh && chown -R ros:ros /home/ros/polaris_ws && chown -R ros:ros /home/ros/steer_polaris_ws
+RUN chown ros:ros /entrypoint.sh && chown -R ros:ros /home/ros/polaris_ws && chown -R ros:ros /home/ros/smart_polaris_ws
 
 # Only allow this for dev containers; disable for prod containers
 RUN if [ "$BUILD_DEV_IMAGE" = "true" ]; then \
@@ -98,7 +100,7 @@ RUN if [ "$BUILD_DEV_IMAGE" = "true" ]; then \
 USER ros
 # Update rosdeps
 RUN rosdep update --include-eol-distros
-WORKDIR /home/ros/steer_polaris_ws
+WORKDIR /home/ros/smart_polaris_ws
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["bash"]

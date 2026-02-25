@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<launch>
+  <param name="use_sim_time" value="true"/>
+
+  <!-- Headless run for automated rostest (no Gazebo GUI, no RViz) -->
+  <arg name="paused" default="false"/>
+  <arg name="use_gui" default="false"/>
+  <arg name="use_rviz" default="false"/>
+  <arg name="waypoints_file" default="$(find gem_integration_tests)/config/wps.csv"/>
+
+  <param name="waypoints_file" value="$(arg waypoints_file)"/>
+
+  <include file="$(find gem_integration_tests)/launch/integration_test.launch">
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="use_gui" value="$(arg use_gui)"/>
+    <arg name="use_rviz" value="$(arg use_rviz)"/>
+    <!-- Do not autostart a goal. This will interfere with the tests -->
+    <arg name="wait_for_nav_goal" value="true"/>
+  </include>
+
+  <test test-name="integration_test_scenarios" pkg="gem_integration_tests" type="integration_test_scenarios.py" time-limit="120.0"/>
+</launch>
