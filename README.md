@@ -75,6 +75,10 @@ A few convenience scripts are provided inside the `runners/` directory to execut
 2. `run_state_manager_rostests.sh`: Run ROS-based unit tests for State Manager with explicit failure scenarios
 3. `run_integration_tests.sh`: Runs integration tests with State Manager, High-level Task Planner, Path Tracking Controller and a headless Gazebo server.
 
+As an example, on launching the `launch_integration_run.sh`, you should see the following simulation and views:
+
+![integration_run](images/integration_run.png)
+
 ### ROS Workspaces
 
 > **Note**: The [Polaris GEM e2](https://gitlab.engr.illinois.edu/gemillins/POLARIS_GEM_e2) is available for public use. However, the respository resides under an organization gitlab account for the University of Illinois at Urbana-Champaign. Forking for the respository is disabled, which motivated the use of the setup described below.
@@ -97,6 +101,10 @@ In general, the architecture was motivated such that the system (to the greatest
 2. **Measurable**: Timing of signals and propagation through the system impact system behaviour can be profiled/audited
 3. **ROS Agnostic**: To simplify migration to ROS 2 (at a later time), use of ROS-based constructs (e.g. publishing, subscribing, callbacks etc.) should be decoupled from system logic as much as possible
 4. **Testable**: To enable translation of this project to real mobile platforms for a variety of use cases, the system needs to be testable. A number of realisitic failure scenarios are generated and tested via structured tests for these new modules
+
+For reference to the overall system architecture (nodes, topics etc) as you read through this material, it might be helpful to refer back to the following image from time to time:
+
+![system_architecture](images/node_topic_graph.png)
 
 
 ### GEM State Manager
